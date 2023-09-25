@@ -1,6 +1,8 @@
 import joblib
 import numpy as np
 import pandas as pd
+from sklearn.dummy import DummyClassifier
+from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from scipy.sparse import save_npz, load_npz, csr_matrix
@@ -119,6 +121,45 @@ save_npz(utils.feature_dir.joinpath("lib_1grams.npz"), lib_ngrams[:, top_frqn_ft
 utils.List("lib_1gram_names.txt").save([lib_ngram_vct.get_feature_names_out()[i] for i in top_frqn_ftr_idx])
 ######
 
+slgn_stats = utils.IndividualScoreStats("individual_socres.csv")
+
+# Baseline
+dummy_clf = DummyClassifier(strategy="most_frequent")
+dummy_clf.fit(labels, labels["Class"])
+y_pred = dummy_clf.predict(labels)
+base_score = accuracy_score(labels, y_pred)
+
+### Fize Size
 print("[*] Done!\n\n[*] Individual Feature Experiments - File Sizes")
 X = utils.CSVFeature("file_sizes.csv").load()
+slgn_stats.new_feature(utils.FILE_SIZE, len(X.columns))
+slgn_stats.update(utils.FILE_SIZE, utils.BASE, base_score)
 
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+
+# KNN
+score, auto_knn = utils.automl_cross_val(utils.FILE_SIZE, utils.KNN, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.FILE_SIZE, utils.KNN, score)
+
+print(f"Best {utils.KNN} model:\n {utils.best_model(auto_knn)}")
+print(auto_knn.sprint_statistics())
+
+# SVM
+score, auto_svm = utils.automl_cross_val(utils.FILE_SIZE, utils.SVM, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.FILE_SIZE, utils.SVM, score)
+
+print(f"Best {utils.SVM} model:\n {utils.best_model(auto_svm)}")
+print(auto_svm.sprint_statistics())
+
+# RF
+score, auto_rf = utils.automl_cross_val(utils.FILE_SIZE, utils.RF, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.FILE_SIZE, utils.RF, score)
+
+print(f"Best {utils.RF} model:\n {utils.best_model(auto_rf)}")
+print(auto_rf.sprint_statistics())
+
+# Summary
+slgn_stats.save()
+summary = slgn_stats.df.loc[utils.FILE_SIZE, [utils.BASE, utils.KNN, utils.SVM, utils.RF]].sort_values(ascending=False)
+print(f"Summary:\n{summary}")
+###

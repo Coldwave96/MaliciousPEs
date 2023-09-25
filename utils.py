@@ -1,7 +1,10 @@
+import numpy as np
 import pandas as pd
 from pathlib import Path
 from scipy.sparse import load_npz
 from collections.abc import Sequence
+from sklearn.metrics import accuracy_score
+from autosklearn.classification import AutoSklearnClassifier
 
 # The family names of malware samples
 classes = ("Ramnit", "Lollipop", "Kelihos_ver3", "Vundo", "Simda", "Tracur", "Kelihos_ver1", "Obfuscator.ACY", "Gatak")
@@ -71,7 +74,7 @@ class CSVFeature:
         """
         data.to_csv(feature_dir.joinpath(self.file))
     
-    def load(self) -> pd.DataFrame | None:
+    def load(self):
         """
         Load a dataframe from a `.csv` file.
 
@@ -92,7 +95,7 @@ class NPZFeature:
         """
         self.file: str = file
     
-    def load(self) -> pd.DataFrame | None:
+    def load(self):
         """
         Load a dataframe from a `.npz` file.
 
@@ -125,7 +128,7 @@ class List:
             for line in data:
                 file.write(f"{str(line)}\n")
     
-    def load(self) -> list[str] | None:
+    def load(self):
         """
         Load a sequence from a list file.
 
@@ -147,3 +150,126 @@ class Section:
         self.raw_size: int = 0
         self.executable: bool = False
         self.writable: bool = False
+
+# Model Names
+BASE = "Baseline"
+KNN = "K-Nearest"
+SVM = "Support Vector"
+RF = "Random Forest"
+
+# Feature Names
+FILE_SIZE = "File Size"
+SCTN_SIZE = "Section Size"
+RWE_SIZE = "Section Permission"
+API_NGRAM = "API 4-gram"
+OPCODE_NGRAM = "Opcode 4-gram"
+CMPLXTY = "Content Complexity"
+IMP_LIB = "Import Library"
+
+# Manage test scores
+class IndividualScoreStats:
+    def __init__(self, file: str) -> None:
+        """
+        Load or create a new score dataframe.
+        """
+        self._path: Path = stats_dir.joinpath(file)
+        if self._path.exists():
+            self.df: pd.DataFrame = pd.read_csv(self._path).set_index("Feature")
+        else:
+            self.df: pd.DataFrame = pd.DataFrame(columns=["Feature", BASE, KNN, SVM, RF, "Dimension"]).set_index("Feature")
+    
+    def new_feature(self, name: str, dimension) -> None:
+        self.df.at[name, "Dimension"] = dimension
+
+    def update(self, ftr: str, mod: str, score: float) -> None:
+        """
+        Update a score.
+
+        -- PARAMETERS --
+        ftr: A feature name.
+        mod: A model name.
+        score: A score value.
+        """
+        self.df.at[ftr, mod] = round(score, 4)
+
+    def save(self) -> None:
+        """
+        Save scores to a `.csv` file.
+        """
+        self.df.to_csv(self._path)
+
+MEMO_LIMIT = 1024 * 10
+TIME_LIMIT = 20
+
+def automl_cross_val(ftr: str, mod: str, X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.DataFrame, y_test: pd.DataFrame):
+    if mod == KNN:
+        include = ["k_nearest_neighbors"]
+    elif mod == SVM:
+        include = ["libsvm_svc"]
+    elif mod == RF:
+        include = ["random_forest"]
+    elif mod is None or len(mod) == 0:
+        include = None
+    else:
+        assert False, "Unknown Model"
+
+    if include is None:
+        automl = AutoSklearnClassifier(
+            memory_limit = MEMO_LIMIT,
+            time_left_for_this_task = TIME_LIMIT * 60, 
+            ensemble_size = 1, 
+            resampling_strategy = "cv", 
+            resampling_strategy_arguments = {"folds": 5}
+        )
+    else:
+        automl = AutoSklearnClassifier(
+            memory_limit = MEMO_LIMIT, 
+            time_left_for_this_task = TIME_LIMIT * 60, 
+            ensemble_size = 1, 
+            include_estimators = include, 
+            resampling_strategy = "cv", 
+            resampling_strategy_arguments = {"folds": 5}
+        )
+    automl.fit(X_train, y_train)
+    y_pred = automl.predict(X_test).astype(int)
+    return accuracy_score(y_test, y_pred), automl
+
+def best_model(automl: AutoSklearnClassifier) -> dict:
+    """
+    Get the best model from an `AutoSklearnClassifier` object.
+    """
+    return automl.cv_results_["params"][np.argmax(automl.cv_results_["mean_test_score"])]
+
+class IndividualScoreStats:
+    """
+    Manage test scores.
+    """
+    def __init__(self, file: str) -> None:
+        """
+        Load or create a new score dataframe.
+        """
+        self._path: Path = stats_dir.joinpath(file)
+        if self._path.exists():
+            self.df: pd.DataFrame = pd.read_csv(self._path).set_index("Feature")
+        else:
+            self.df: pd.DataFrame = pd.DataFrame(columns=["Feature", BASE, KNN, SVM, RF, "Dimension"]).set_index("Feature")
+    
+    def new_feature(self, name: str, dimension) -> None:
+        self.df.at[name, "Dimension"] = dimension
+    
+    def update(self, ftr: str, mod: str, score: float) -> None:
+        """
+        Update a score.
+
+        -- PARAMETERS --
+        ftr: A feature name.
+        mod: A model name.
+        score: A score value.
+        """
+        self.df.at[ftr, mod] = round(score, 4)
+
+    def save(self) -> None:
+        """
+        Save scores to a `.csv` file.
+        """
+        self.df.to_csv(self._path)
