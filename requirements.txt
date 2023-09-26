@@ -2,4 +2,3 @@ pandas
 scipy
 scikit-learn
 tqdm
-auto-sklearn

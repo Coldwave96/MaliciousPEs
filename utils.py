@@ -74,7 +74,7 @@ class CSVFeature:
         """
         data.to_csv(feature_dir.joinpath(self.file))
     
-    def load(self):
+    def load(self) -> pd.DataFrame | None:
         """
         Load a dataframe from a `.csv` file.
 
@@ -95,7 +95,7 @@ class NPZFeature:
         """
         self.file: str = file
     
-    def load(self):
+    def load(self) -> pd.DataFrame | None:
         """
         Load a dataframe from a `.npz` file.
 
@@ -128,7 +128,7 @@ class List:
             for line in data:
                 file.write(f"{str(line)}\n")
     
-    def load(self):
+    def load(self) -> list[str] | None:
         """
         Load a sequence from a list file.
 
@@ -178,7 +178,7 @@ class IndividualScoreStats:
         else:
             self.df: pd.DataFrame = pd.DataFrame(columns=["Feature", BASE, KNN, SVM, RF, "Dimension"]).set_index("Feature")
     
-    def new_feature(self, name: str, dimension) -> None:
+    def new_feature(self, name: str, dimension: str | int) -> None:
         self.df.at[name, "Dimension"] = dimension
 
     def update(self, ftr: str, mod: str, score: float) -> None:
@@ -254,7 +254,7 @@ class IndividualScoreStats:
         else:
             self.df: pd.DataFrame = pd.DataFrame(columns=["Feature", BASE, KNN, SVM, RF, "Dimension"]).set_index("Feature")
     
-    def new_feature(self, name: str, dimension) -> None:
+    def new_feature(self, name: str, dimension: str | int) -> None:
         self.df.at[name, "Dimension"] = dimension
     
     def update(self, ftr: str, mod: str, score: float) -> None:
@@ -340,7 +340,7 @@ class IntegratedScoreStats:
         else:
             self._df: pd.DataFrame = pd.DataFrame(columns=["Feature", "Dimension", "Best Accuracy", "Best Model"])
     
-    def new_feature(self, name: str, dimension) -> None:
+    def new_feature(self, name: str, dimension: str | int) -> None:
         self.df.at[name, "Dimension"] = dimension
     
     def update(self, ftr: str, mod: str, score: float) -> None:

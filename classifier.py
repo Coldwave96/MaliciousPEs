@@ -5,7 +5,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from scipy.sparse import save_npz, load_npz, csr_matrix
+from scipy.sparse import save_npz, csr_matrix
 
 import utils
 import feature_extraction
