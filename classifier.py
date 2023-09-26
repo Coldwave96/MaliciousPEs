@@ -121,6 +121,7 @@ save_npz(utils.feature_dir.joinpath("lib_1grams.npz"), lib_ngrams[:, top_frqn_ft
 utils.List("lib_1gram_names.txt").save([lib_ngram_vct.get_feature_names_out()[i] for i in top_frqn_ftr_idx])
 ######
 
+###### Individual Feature Experiments
 slgn_stats = utils.IndividualScoreStats("individual_socres.csv")
 
 # Baseline
@@ -141,25 +142,349 @@ X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, st
 score, auto_knn = utils.automl_cross_val(utils.FILE_SIZE, utils.KNN, X_train, X_test, y_train, y_test)
 slgn_stats.update(utils.FILE_SIZE, utils.KNN, score)
 
-print(f"Best {utils.KNN} model:\n {utils.best_model(auto_knn)}")
+print(f"Best {utils.KNN} model:\n{utils.best_model(auto_knn)}\n")
 print(auto_knn.sprint_statistics())
 
 # SVM
 score, auto_svm = utils.automl_cross_val(utils.FILE_SIZE, utils.SVM, X_train, X_test, y_train, y_test)
 slgn_stats.update(utils.FILE_SIZE, utils.SVM, score)
 
-print(f"Best {utils.SVM} model:\n {utils.best_model(auto_svm)}")
+print(f"Best {utils.SVM} model:\n{utils.best_model(auto_svm)}\n")
 print(auto_svm.sprint_statistics())
 
 # RF
 score, auto_rf = utils.automl_cross_val(utils.FILE_SIZE, utils.RF, X_train, X_test, y_train, y_test)
 slgn_stats.update(utils.FILE_SIZE, utils.RF, score)
 
-print(f"Best {utils.RF} model:\n {utils.best_model(auto_rf)}")
+print(f"Best {utils.RF} model:\n{utils.best_model(auto_rf)}\n")
 print(auto_rf.sprint_statistics())
 
 # Summary
 slgn_stats.save()
 summary = slgn_stats.df.loc[utils.FILE_SIZE, [utils.BASE, utils.KNN, utils.SVM, utils.RF]].sort_values(ascending=False)
-print(f"Summary:\n{summary}")
+print(f"Summary:\n{summary}\n")
 ###
+
+### PE Section Sizes
+print("[*] Individual Feature Experiments - PE Section Sizes")
+X = utils.CSVFeature("section_sizes.csv").load()
+slgn_stats.new_feature(utils.SCTN_SIZE, f"{len(sctn_sizes.columns)} -> {len(X.columns)}")
+slgn_stats.update(utils.SCTN_SIZE, utils.BASE, base_score)
+
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+
+# KNN
+score, auto_knn = utils.automl_cross_val(utils.SCTN_SIZE, utils.KNN, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.SCTN_SIZE, utils.KNN, score)
+
+print(f"Best {utils.KNN} model:\n{utils.best_model(auto_knn)}\n")
+print(auto_knn.sprint_statistics())
+
+# SVM
+score, auto_svm = utils.automl_cross_val(utils.SCTN_SIZE, utils.SVM, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.SCTN_SIZE, utils.SVM, score)
+
+print(f"Best {utils.SVM} model:\n{utils.best_model(auto_svm)}\n")
+print(auto_svm.sprint_statistics())
+
+# RF
+score, auto_rf = utils.automl_cross_val(utils.SCTN_SIZE, utils.RF, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.SCTN_SIZE, utils.RF, score)
+
+print(f"Best {utils.RF} model:\n{utils.best_model(auto_rf)}\n")
+print(auto_rf.sprint_statistics())
+
+# Summary
+slgn_stats.save()
+summary = slgn_stats.df.loc[utils.SCTN_SIZE, [utils.BASE, utils.KNN, utils.SVM, utils.RF]].sort_values(ascending=False)
+print(f"Summary:\n{summary}\n")
+###
+
+### PE Section Permissions
+print("[*] Individual Feature Experiments - PE Section Permissions")
+X = utils.CSVFeature("rwe_sizes.csv").load()
+slgn_stats.new_feature(utils.RWE_SIZE, len(X.columns))
+slgn_stats.update(utils.RWE_SIZE, utils.BASE, base_score)
+
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+
+# KNN
+score, auto_knn = utils.automl_cross_val(utils.RWE_SIZE, utils.KNN, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.RWE_SIZE, utils.KNN, score)
+
+print(f"Best {utils.KNN} model:\n{utils.best_model(auto_knn)}\n")
+print(auto_knn.sprint_statistics())
+
+# SVM
+score, auto_svm = utils.automl_cross_val(utils.RWE_SIZE, utils.SVM, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.RWE_SIZE, utils.SVM, score)
+
+print(f"Best {utils.SVM} model:\n{utils.best_model(auto_svm)}\n")
+print(auto_svm.sprint_statistics())
+
+# RF
+score, auto_rf = utils.automl_cross_val(utils.RWE_SIZE, utils.RF, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.RWE_SIZE, utils.RF, score)
+
+print(f"Best {utils.RF} model:\n{utils.best_model(auto_rf)}\n")
+print(auto_rf.sprint_statistics())
+
+# Summary
+slgn_stats.save()
+summary = slgn_stats.df.loc[utils.RWE_SIZE, [utils.BASE, utils.KNN, utils.SVM, utils.RF]].sort_values(ascending=False)
+print(f"Summary:\n{summary}\n")
+###
+
+### API 4-grams
+print("[*] Individual Feature Experiments - API 4-grams")
+X = utils.NPZFeature("api_4grams.csv").load().set_index(labels.index)
+slgn_stats.new_feature(utils.API_NGRAM, f"{len(api_ngrams.shape[1])} -> {len(X.columns)}")
+slgn_stats.update(utils.API_NGRAM, utils.BASE, base_score)
+
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+
+# KNN
+score, auto_knn = utils.automl_cross_val(utils.API_NGRAM, utils.KNN, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.API_NGRAM, utils.KNN, score)
+
+print(f"Best {utils.KNN} model:\n{utils.best_model(auto_knn)}\n")
+print(auto_knn.sprint_statistics())
+
+# SVM
+score, auto_svm = utils.automl_cross_val(utils.API_NGRAM, utils.SVM, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.API_NGRAM, utils.SVM, score)
+
+print(f"Best {utils.SVM} model:\n{utils.best_model(auto_svm)}\n")
+print(auto_svm.sprint_statistics())
+
+# RF
+score, auto_rf = utils.automl_cross_val(utils.API_NGRAM, utils.RF, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.API_NGRAM, utils.RF, score)
+
+print(f"Best {utils.RF} model:\n{utils.best_model(auto_rf)}\n")
+print(auto_rf.sprint_statistics())
+
+# Summary
+slgn_stats.save()
+summary = slgn_stats.df.loc[utils.API_NGRAM, [utils.BASE, utils.KNN, utils.SVM, utils.RF]].sort_values(ascending=False)
+print(f"Summary:\n{summary}\n")
+###
+
+### Opcode 4-grams
+print("[*] Individual Feature Experiments - Opcode 4-grams")
+X = utils.NPZFeature("opcode_4grams.csv").load().set_index(labels.index)
+slgn_stats.new_feature(utils.OPCODE_NGRAM, f"{len(opcode_ngrams.shape[1])} -> {len(X.columns)}")
+slgn_stats.update(utils.OPCODE_NGRAM, utils.BASE, base_score)
+
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+
+# KNN
+score, auto_knn = utils.automl_cross_val(utils.OPCODE_NGRAM, utils.KNN, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.OPCODE_NGRAM, utils.KNN, score)
+
+print(f"Best {utils.KNN} model:\n{utils.best_model(auto_knn)}\n")
+print(auto_knn.sprint_statistics())
+
+# SVM
+score, auto_svm = utils.automl_cross_val(utils.OPCODE_NGRAM, utils.SVM, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.OPCODE_NGRAM, utils.SVM, score)
+
+print(f"Best {utils.SVM} model:\n{utils.best_model(auto_svm)}\n")
+print(auto_svm.sprint_statistics())
+
+# RF
+score, auto_rf = utils.automl_cross_val(utils.OPCODE_NGRAM, utils.RF, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.OPCODE_NGRAM, utils.RF, score)
+
+print(f"Best {utils.RF} model:\n{utils.best_model(auto_rf)}\n")
+print(auto_rf.sprint_statistics())
+
+# Summary
+slgn_stats.save()
+summary = slgn_stats.df.loc[utils.OPCODE_NGRAM, [utils.BASE, utils.KNN, utils.SVM, utils.RF]].sort_values(ascending=False)
+print(f"Summary:\n{summary}\n")
+###
+
+### Content Complexity
+print("[*] Individual Feature Experiments - Content Complexity")
+X = utils.CSVFeature("content_complexity.csv").load()
+slgn_stats.new_feature(utils.CMPLXTY, len(X.columns))
+slgn_stats.update(utils.CMPLXTY, utils.BASE, base_score)
+
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+
+# KNN
+score, auto_knn = utils.automl_cross_val(utils.CMPLXTY, utils.KNN, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.CMPLXTY, utils.KNN, score)
+
+print(f"Best {utils.KNN} model:\n{utils.best_model(auto_knn)}\n")
+print(auto_knn.sprint_statistics())
+
+# SVM
+score, auto_svm = utils.automl_cross_val(utils.CMPLXTY, utils.SVM, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.CMPLXTY, utils.SVM, score)
+
+print(f"Best {utils.SVM} model:\n{utils.best_model(auto_svm)}\n")
+print(auto_svm.sprint_statistics())
+
+# RF
+score, auto_rf = utils.automl_cross_val(utils.CMPLXTY, utils.RF, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.CMPLXTY, utils.RF, score)
+
+print(f"Best {utils.RF} model:\n{utils.best_model(auto_rf)}\n")
+print(auto_rf.sprint_statistics())
+
+# Summary
+slgn_stats.save()
+summary = slgn_stats.df.loc[utils.CMPLXTY, [utils.BASE, utils.KNN, utils.SVM, utils.RF]].sort_values(ascending=False)
+print(f"Summary:\n{summary}\n")
+###
+
+### Import Libraries
+print("[*] Individual Feature Experiments - Import Libraries")
+X = utils.NPZFeature("lib_1grams.csv").load().set_index(labels.index)
+slgn_stats.new_feature(utils.IMP_LIB, f"{len(lib_ngrams.shape[1])} -> {len(X.columns)}")
+slgn_stats.update(utils.IMP_LIB, utils.BASE, base_score)
+
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+
+# KNN
+score, auto_knn = utils.automl_cross_val(utils.IMP_LIB, utils.KNN, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.IMP_LIB, utils.KNN, score)
+
+print(f"Best {utils.KNN} model:\n{utils.best_model(auto_knn)}\n")
+print(auto_knn.sprint_statistics())
+
+# SVM
+score, auto_svm = utils.automl_cross_val(utils.IMP_LIB, utils.SVM, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.IMP_LIB, utils.SVM, score)
+
+print(f"Best {utils.SVM} model:\n{utils.best_model(auto_svm)}\n")
+print(auto_svm.sprint_statistics())
+
+# RF
+score, auto_rf = utils.automl_cross_val(utils.IMP_LIB, utils.RF, X_train, X_test, y_train, y_test)
+slgn_stats.update(utils.IMP_LIB, utils.RF, score)
+
+print(f"Best {utils.RF} model:\n{utils.best_model(auto_rf)}\n")
+print(auto_rf.sprint_statistics())
+
+# Summary
+slgn_stats.save()
+summary = slgn_stats.df.loc[utils.IMP_LIB, [utils.BASE, utils.KNN, utils.SVM, utils.RF]].sort_values(ascending=False)
+print(f"Summary:\n{summary}\n")
+###
+######
+
+###### Integrated Feature Experiments
+intgr_stats = utils.IntegratedScoreStats("integrated_scores.csv")
+
+### PE Section Sizes + PE Section Permissions + Content Complexity
+print("[*] Individual Feature Experiments - PE Section Sizes + PE Section Permissions + Content Complexity")
+X = utils.integrated_features((utils.SCTN_SIZE, utils.RWE_SIZE, utils.CMPLXTY))
+raw_dim = len(sctn_sizes.columns) + int(slgn_stats.df.at[utils.RWE_SIZE, "Dimension"]) + int(slgn_stats.df.at[utils.CMPLXTY, "Dimension"])
+intgr_stats.new_feature(utils.SCTN_RWE_CMPLXTY, f"{raw_dim} -> {len(X.columns)}")
+
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+
+# KNN
+score, auto_knn = utils.automl_cross_val(utils.SCTN_RWE_CMPLXTY, utils.KNN, X_train, X_test, y_train, y_test)
+intgr_stats.update(utils.SCTN_RWE_CMPLXTY, utils.KNN, score)
+
+print(f"Best {utils.KNN} model:\n{utils.best_model(auto_knn)}\n")
+print(auto_knn.sprint_statistics())
+
+# RF
+score, auto_rf = utils.automl_cross_val(utils.SCTN_RWE_CMPLXTY, utils.RF, X_train, X_test, y_train, y_test)
+intgr_stats.update(utils.SCTN_RWE_CMPLXTY, utils.RF, score)
+
+print(f"Best {utils.RF} model:\n{utils.best_model(auto_rf)}\n")
+print(auto_rf.sprint_statistics())
+###
+
+### PE Section Sizes + PE Section Permissions + Content Complexity + Import Libraries
+print("[*] Individual Feature Experiments - PE Section Sizes + PE Section Permissions + Content Complexity + Import Libraries")
+X = utils.integrated_features((utils.SCTN_SIZE, utils.RWE_SIZE, utils.CMPLXTY, utils.IMP_LIB))
+raw_dim = len(sctn_sizes.columns) + int(slgn_stats.df.at[utils.RWE_SIZE, "Dimension"]) + int(slgn_stats.df.at[utils.CMPLXTY, "Dimension"]) + lib_ngrams.shape[1]
+intgr_stats.new_feature(utils.SCTN_RWE_CMPLXTY_LIB, f"{raw_dim} -> {len(X.columns)}")
+
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+
+# KNN
+score, auto_knn = utils.automl_cross_val(utils.SCTN_RWE_CMPLXTY_LIB, utils.KNN, X_train, X_test, y_train, y_test)
+intgr_stats.update(utils.SCTN_RWE_CMPLXTY_LIB, utils.KNN, score)
+
+print(f"Best {utils.KNN} model:\n{utils.best_model(auto_knn)}\n")
+print(auto_knn.sprint_statistics())
+
+# RF
+score, auto_rf = utils.automl_cross_val(utils.SCTN_RWE_CMPLXTY_LIB, utils.RF, X_train, X_test, y_train, y_test)
+intgr_stats.update(utils.SCTN_RWE_CMPLXTY_LIB, utils.RF, score)
+
+print(f"Best {utils.RF} model:\n{utils.best_model(auto_rf)}\n")
+print(auto_rf.sprint_statistics())
+###
+
+### File Sizes + API 4-grams + Opcode 4-grams
+X = utils.integrated_features((utils.FILE_SIZE, utils.API_NGRAM, utils.OPCODE_NGRAM))
+raw_dim = int(slgn_stats.df.at[utils.FILE_SIZE, "Dimension"]) + api_ngrams.shape[1] + opcode_ngrams.shape[1]
+intgr_stats.new_feature(utils.FILE_API_OPCODE, f"{raw_dim} → {len(X.columns)}")
+
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+
+# KNN
+score, auto_knn = utils.automl_cross_val(utils.FILE_API_OPCODE, utils.KNN, X_train, X_test, y_train, y_test)
+intgr_stats.update(utils.FILE_API_OPCODE, utils.KNN, score)
+
+print(f"Best {utils.KNN} model:\n{utils.best_model(auto_knn)}\n")
+print(auto_knn.sprint_statistics())
+
+# RF
+score, auto_rf = utils.automl_cross_val(utils.FILE_API_OPCODE, utils.RF, X_train, X_test, y_train, y_test)
+intgr_stats.update(utils.FILE_API_OPCODE, utils.RF, score)
+
+print(f"Best {utils.RF} model:\n{utils.best_model(auto_rf)}\n")
+print(auto_rf.sprint_statistics())
+###
+
+### All Features
+X = utils.integrated_features((utils.FILE_SIZE, utils.SCTN_SIZE, utils.RWE_SIZE, utils.CMPLXTY, utils.API_NGRAM, utils.OPCODE_NGRAM, utils.IMP_LIB))
+raw_dim = int(slgn_stats.df.at[utils.FILE_SIZE, "Dimension"]) + len(sctn_sizes.columns) + int(slgn_stats.df.at[utils.RWE_SIZE, "Dimension"]) + int(slgn_stats.df.at[utils.CMPLXTY, "Dimension"]) + api_ngrams.shape[1] + opcode_ngrams.shape[1] + lib_ngrams.shape[1]
+intgr_stats.new_feature(utils.ALL, f"{raw_dim} → {len(X.columns)}")
+
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+
+# KNN
+score, auto_knn = utils.automl_cross_val(utils.ALL, utils.KNN, X_train, X_test, y_train, y_test)
+intgr_stats.update(utils.ALL, utils.KNN, score)
+
+print(f"Best {utils.KNN} model:\n{utils.best_model(auto_knn)}\n")
+print(auto_knn.sprint_statistics())
+
+# RF
+score, auto_rf = utils.automl_cross_val(utils.ALL, utils.RF, X_train, X_test, y_train, y_test)
+intgr_stats.update(utils.ALL, utils.RF, score)
+
+print(f"Best {utils.RF} model:\n{utils.best_model(auto_rf)}\n")
+print(auto_rf.sprint_statistics())
+###
+
+### Summary
+intgr_stats.save()
+summary = intgr_stats.df
+print(f"Summary:\n{summary}\n")
+###
+######
+
+###### Summary For All Experiments
+stats = intgr_stats.df.copy()
+for ftr, row in slgn_stats.df.iterrows():
+    stats.at[ftr, "Dimension"] = row["Dimension"]
+    stats.at[ftr, "Best Accuracy"] = row[[utils.KNN, utils.SVM, utils.RF]].max()
+    stats.at[ftr, "Best Model"] = (utils.KNN, utils.SVM, utils.RF)[row[[utils.KNN, utils.SVM, utils.RF]].values.argmax()]
+
+stats.sort_values(by="Best Accuracy", ascending=False, inplace=True)
+stats.to_csv(utils.stats_dir.joinpath("scores.csv")) 
+summary = stats.df
+print(f"Summary for all expriments:\n{summary}\n")
+######

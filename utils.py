@@ -273,3 +273,91 @@ class IndividualScoreStats:
         Save scores to a `.csv` file.
         """
         self.df.to_csv(self._path)
+
+"""
+Integrated Feature Names
+"""
+SCTN_RWE_CMPLXTY = "Section Size + Section Permission + Content Complexity"
+SCTN_RWE_CMPLXTY_LIB = "Section Size + Section Permission + Content Complexity + Import Library"
+FILE_API_OPCODE = "File Size + API 4-gram + Opcode 4-gram"
+ALL = "All Features"
+
+def integrated_features(ftrs: set[str], labels: pd.DataFrame) -> pd.DataFrame:
+    """
+    Integrate features.
+    """
+    def load_npz(file: str, prefix: str) -> pd.DataFrame:
+        df = NPZFeature(file).load()
+        df["ID"] = labels.index
+        df.set_index("ID", inplace=True)
+        df.columns = [f"{prefix}-{str(col)}" for col in df.columns]
+        return df
+    
+    file_sizes = CSVFeature("file_sizes.csv").load()
+    sctn_sizes = CSVFeature("section_sizes.csv").load()
+    rwe_sizes = CSVFeature("section_permissions.csv").load()
+    cmplxty = CSVFeature("content_complexity.csv").load()
+
+    api_4grams = load_npz("api_4grams.npz", "api")
+    opcode_4grams = load_npz("opcode_4grams.npz", "opcode")
+    lib_1grams = load_npz("lib_1grams.npz", "lib")
+
+    dfs = []
+    if FILE_SIZE in ftrs:
+        dfs.append(file_sizes)
+    
+    if SCTN_SIZE in ftrs:
+        dfs.append(sctn_sizes)
+    
+    if RWE_SIZE in ftrs:
+        dfs.append(rwe_sizes)
+    
+    if CMPLXTY in ftrs:
+        dfs.append(cmplxty)
+    
+    if API_NGRAM in ftrs:
+        dfs.append(api_4grams)
+    
+    if OPCODE_NGRAM in ftrs:
+        dfs.append(opcode_4grams)
+    
+    if IMP_LIB in ftrs:
+        dfs.append(lib_1grams)
+    
+    return pd.concat(dfs, axis="columns")
+
+class IntegratedScoreStats:
+    """
+    Manage test scores.
+    """
+    def __init__(self, file: str) -> None:
+        """
+        Load or create a new score dataframe.
+        """
+        self._path: Path = stats_dir.joinpath(file)
+        if self._path.exists():
+            self._df: pd.DataFrame = pd.read_csv(self._path).set_index("Features")
+        else:
+            self._df: pd.DataFrame = pd.DataFrame(columns=["Feature", "Dimension", "Best Accuracy", "Best Model"])
+    
+    def new_feature(self, name: str, dimension) -> None:
+        self.df.at[name, "Dimension"] = dimension
+    
+    def update(self, ftr: str, mod: str, score: float) -> None:
+        """
+        Update a score.
+
+        -- PARAMETERS --
+        ftr: A feature name.
+        mod: A model name.
+        score: A score value.
+        """
+        if score > self.df.at[ftr, "Best Accuracy"]:
+            self.df.at[ftr, "Best Accuracy"] = round(score, 4)
+            self.df.at[ftr, "Best Model"] = mod
+        
+    def save(self) -> None:
+        """
+        Save scores to a `.csv` file.
+        """
+        self.df.to_csv(self._path)
