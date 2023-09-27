@@ -1,4 +1,7 @@
 pandas
 scipy
-scikit-learn
 tqdm
+scikit-learn==0.24.2
+dask==2021.12
+distributed==2021.12
+auto-sklearn==0.15.0

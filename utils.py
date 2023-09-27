@@ -74,7 +74,7 @@ class CSVFeature:
         """
         data.to_csv(feature_dir.joinpath(self.file))
     
-    def load(self) -> pd.DataFrame | None:
+    def load(self):
         """
         Load a dataframe from a `.csv` file.
 
@@ -95,7 +95,7 @@ class NPZFeature:
         """
         self.file: str = file
     
-    def load(self) -> pd.DataFrame | None:
+    def load(self):
         """
         Load a dataframe from a `.npz` file.
 
@@ -128,7 +128,7 @@ class List:
             for line in data:
                 file.write(f"{str(line)}\n")
     
-    def load(self) -> list[str] | None:
+    def load(self):
         """
         Load a sequence from a list file.
 
@@ -178,7 +178,7 @@ class IndividualScoreStats:
         else:
             self.df: pd.DataFrame = pd.DataFrame(columns=["Feature", BASE, KNN, SVM, RF, "Dimension"]).set_index("Feature")
     
-    def new_feature(self, name: str, dimension: str | int) -> None:
+    def new_feature(self, name: str, dimension) -> None:
         self.df.at[name, "Dimension"] = dimension
 
     def update(self, ftr: str, mod: str, score: float) -> None:
@@ -226,7 +226,7 @@ def automl_cross_val(ftr: str, mod: str, X_train: pd.DataFrame, X_test: pd.DataF
             memory_limit = MEMO_LIMIT, 
             time_left_for_this_task = TIME_LIMIT * 60, 
             ensemble_size = 1, 
-            include_estimators = include, 
+            include = {"classifier": include}, 
             resampling_strategy = "cv", 
             resampling_strategy_arguments = {"folds": 5}
         )
@@ -254,7 +254,7 @@ class IndividualScoreStats:
         else:
             self.df: pd.DataFrame = pd.DataFrame(columns=["Feature", BASE, KNN, SVM, RF, "Dimension"]).set_index("Feature")
     
-    def new_feature(self, name: str, dimension: str | int) -> None:
+    def new_feature(self, name: str, dimension) -> None:
         self.df.at[name, "Dimension"] = dimension
     
     def update(self, ftr: str, mod: str, score: float) -> None:
@@ -340,7 +340,7 @@ class IntegratedScoreStats:
         else:
             self._df: pd.DataFrame = pd.DataFrame(columns=["Feature", "Dimension", "Best Accuracy", "Best Model"])
     
-    def new_feature(self, name: str, dimension: str | int) -> None:
+    def new_feature(self, name: str, dimension) -> None:
         self.df.at[name, "Dimension"] = dimension
     
     def update(self, ftr: str, mod: str, score: float) -> None:
