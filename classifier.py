@@ -43,7 +43,7 @@ utils.CSVFeature("section_permissions.csv").save(rwe_sizes)
 
 # Dimensionality Reduction
 # Use Random Forest to choose the most important section columns, remaining the top 25
-X_train, X_test, y_train, y_test = train_test_split(sctn_sizes, labels, test_size=0.2, random_state=42, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(sctn_sizes, labels, test_size=0.2, random_state=42)
 
 rnd_clf = RandomForestClassifier()
 rnd_clf.fit(X_train, y_train.values.ravel())
@@ -136,7 +136,7 @@ X = utils.CSVFeature("file_sizes.csv").load()
 slgn_stats.new_feature(utils.FILE_SIZE, len(X.columns))
 slgn_stats.update(utils.FILE_SIZE, utils.BASE, base_score)
 
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # KNN
 score, auto_knn = utils.automl_cross_val(utils.FILE_SIZE, utils.KNN, X_train, X_test, y_train, y_test)
@@ -171,7 +171,7 @@ X = utils.CSVFeature("section_sizes.csv").load()
 slgn_stats.new_feature(utils.SCTN_SIZE, f"{len(sctn_sizes.columns)} -> {len(X.columns)}")
 slgn_stats.update(utils.SCTN_SIZE, utils.BASE, base_score)
 
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # KNN
 score, auto_knn = utils.automl_cross_val(utils.SCTN_SIZE, utils.KNN, X_train, X_test, y_train, y_test)
@@ -206,7 +206,7 @@ X = utils.CSVFeature("rwe_sizes.csv").load()
 slgn_stats.new_feature(utils.RWE_SIZE, len(X.columns))
 slgn_stats.update(utils.RWE_SIZE, utils.BASE, base_score)
 
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # KNN
 score, auto_knn = utils.automl_cross_val(utils.RWE_SIZE, utils.KNN, X_train, X_test, y_train, y_test)
@@ -241,7 +241,7 @@ X = utils.NPZFeature("api_4grams.csv").load().set_index(labels.index)
 slgn_stats.new_feature(utils.API_NGRAM, f"{len(api_ngrams.shape[1])} -> {len(X.columns)}")
 slgn_stats.update(utils.API_NGRAM, utils.BASE, base_score)
 
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # KNN
 score, auto_knn = utils.automl_cross_val(utils.API_NGRAM, utils.KNN, X_train, X_test, y_train, y_test)
@@ -276,7 +276,7 @@ X = utils.NPZFeature("opcode_4grams.csv").load().set_index(labels.index)
 slgn_stats.new_feature(utils.OPCODE_NGRAM, f"{len(opcode_ngrams.shape[1])} -> {len(X.columns)}")
 slgn_stats.update(utils.OPCODE_NGRAM, utils.BASE, base_score)
 
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # KNN
 score, auto_knn = utils.automl_cross_val(utils.OPCODE_NGRAM, utils.KNN, X_train, X_test, y_train, y_test)
@@ -311,7 +311,7 @@ X = utils.CSVFeature("content_complexity.csv").load()
 slgn_stats.new_feature(utils.CMPLXTY, len(X.columns))
 slgn_stats.update(utils.CMPLXTY, utils.BASE, base_score)
 
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # KNN
 score, auto_knn = utils.automl_cross_val(utils.CMPLXTY, utils.KNN, X_train, X_test, y_train, y_test)
@@ -346,7 +346,7 @@ X = utils.NPZFeature("lib_1grams.csv").load().set_index(labels.index)
 slgn_stats.new_feature(utils.IMP_LIB, f"{len(lib_ngrams.shape[1])} -> {len(X.columns)}")
 slgn_stats.update(utils.IMP_LIB, utils.BASE, base_score)
 
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # KNN
 score, auto_knn = utils.automl_cross_val(utils.IMP_LIB, utils.KNN, X_train, X_test, y_train, y_test)
@@ -385,7 +385,7 @@ X = utils.integrated_features((utils.SCTN_SIZE, utils.RWE_SIZE, utils.CMPLXTY))
 raw_dim = len(sctn_sizes.columns) + int(slgn_stats.df.at[utils.RWE_SIZE, "Dimension"]) + int(slgn_stats.df.at[utils.CMPLXTY, "Dimension"])
 intgr_stats.new_feature(utils.SCTN_RWE_CMPLXTY, f"{raw_dim} -> {len(X.columns)}")
 
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # KNN
 score, auto_knn = utils.automl_cross_val(utils.SCTN_RWE_CMPLXTY, utils.KNN, X_train, X_test, y_train, y_test)
@@ -408,7 +408,7 @@ X = utils.integrated_features((utils.SCTN_SIZE, utils.RWE_SIZE, utils.CMPLXTY, u
 raw_dim = len(sctn_sizes.columns) + int(slgn_stats.df.at[utils.RWE_SIZE, "Dimension"]) + int(slgn_stats.df.at[utils.CMPLXTY, "Dimension"]) + lib_ngrams.shape[1]
 intgr_stats.new_feature(utils.SCTN_RWE_CMPLXTY_LIB, f"{raw_dim} -> {len(X.columns)}")
 
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # KNN
 score, auto_knn = utils.automl_cross_val(utils.SCTN_RWE_CMPLXTY_LIB, utils.KNN, X_train, X_test, y_train, y_test)
@@ -430,7 +430,7 @@ X = utils.integrated_features((utils.FILE_SIZE, utils.API_NGRAM, utils.OPCODE_NG
 raw_dim = int(slgn_stats.df.at[utils.FILE_SIZE, "Dimension"]) + api_ngrams.shape[1] + opcode_ngrams.shape[1]
 intgr_stats.new_feature(utils.FILE_API_OPCODE, f"{raw_dim} → {len(X.columns)}")
 
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # KNN
 score, auto_knn = utils.automl_cross_val(utils.FILE_API_OPCODE, utils.KNN, X_train, X_test, y_train, y_test)
@@ -452,7 +452,7 @@ X = utils.integrated_features((utils.FILE_SIZE, utils.SCTN_SIZE, utils.RWE_SIZE,
 raw_dim = int(slgn_stats.df.at[utils.FILE_SIZE, "Dimension"]) + len(sctn_sizes.columns) + int(slgn_stats.df.at[utils.RWE_SIZE, "Dimension"]) + int(slgn_stats.df.at[utils.CMPLXTY, "Dimension"]) + api_ngrams.shape[1] + opcode_ngrams.shape[1] + lib_ngrams.shape[1]
 intgr_stats.new_feature(utils.ALL, f"{raw_dim} → {len(X.columns)}")
 
-X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, stratify=labels)
+X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
 
 # KNN
 score, auto_knn = utils.automl_cross_val(utils.ALL, utils.KNN, X_train, X_test, y_train, y_test)
