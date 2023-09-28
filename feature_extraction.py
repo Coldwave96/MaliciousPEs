@@ -31,8 +31,8 @@ def ngram_extract(ids: Sequence[str], dir: Path, seq_reader: SeqReader, n: int) 
         A wrapper for file-like input of `CountVectorizer`.
         """
         def __init__(self, id: str, dir: Path) -> None:
-            self.id = id
-            self.dir = dir
+            self._id = id
+            self._dir = dir
         
         def read(self) -> str:
             return seq_reader(self._id, self._dir)

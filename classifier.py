@@ -15,10 +15,13 @@ print("[*] Loading labels...")
 labels = pd.read_csv(utils.data_dir.joinpath("trainLabels.csv"))
 labels["ID"] = labels["Id"].astype(str)
 labels["Class"] = labels["Class"].astype("category")
+labels = labels.drop(columns=["Id"], axis=1)
 labels.set_index("ID", inplace=True)
 
 print("[*] Done!\n\n[*] Extracting features - File Size")
 ###### File Size
+# file_sizes = pd.read_csv(utils.feature_dir.joinpath("file_sizes.csv"))
+
 # Extract each sample's disassembly size and byte size, then calculate the ratio
 file_sizes = feature_extraction.fileSize_extract(labels.index, utils.train_dir)
 assert (file_sizes.index == labels.index).all()
@@ -35,11 +38,17 @@ The 2nd saves the total sizes of sections grouped by access properties.
 
 For each section or access property <X>, there will be three columns named <X>-Virtual, <X>-Raw and <X>-Ratio storing its virtual size, raw size and size ratio.
 """
+# rwe_sizes = pd.read_csv(utils.feature_dir.joinpath("section_permissions.csv"))
+# sctn_sizes = pd.read_csv(utils.feature_dir.joinpath("section_sizes_raw.csv"))
+
 sctn_sizes, rwe_sizes = feature_extraction.sectionAttr_extract(labels.index, utils.train_dir)
 assert (sctn_sizes.index == labels.index).all()
 assert (rwe_sizes.index == labels.index).all()
 
+sctn_sizes.set_index("ID", inplace=True)
+
 utils.CSVFeature("section_permissions.csv").save(rwe_sizes)
+utils.CSVFeature("section_sizes_raw.csv").save(sctn_sizes)
 
 # Dimensionality Reduction
 # Use Random Forest to choose the most important section columns, remaining the top 25
