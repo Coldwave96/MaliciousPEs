@@ -205,7 +205,7 @@ def contentComplexity_extract(ids: Sequence[str], dir: Path) -> pd.DataFrame:
     for id in tqdm(ids):
         asm = utils.Read.asm(dir, id).encode("utf-8")
         bytes = utils.Read.bytes(dir, id)
-        bytes = " ".join([str[byte] for byte in bytes]).encode("utf-8")
+        bytes = " ".join([str(byte) for byte in bytes]).encode("utf-8")
         df.at[id, "Asm-Len"] = len(asm)
         df.at[id, "Zip-Asm-Len"] = len(zlib.compress(asm))
         df.at[id, "Byte-Len"] = len(bytes)
