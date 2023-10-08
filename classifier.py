@@ -228,7 +228,7 @@ print(f"Summary:\n{summary}\n")
 
 ### PE Section Permissions
 print("[*] Individual Feature Experiments - PE Section Permissions")
-X = utils.CSVFeature("rwe_sizes.csv").load()
+X = utils.CSVFeature("section_sizes.csv").load()
 slgn_stats.new_feature(utils.RWE_SIZE, len(X.columns))
 slgn_stats.update(utils.RWE_SIZE, utils.BASE, base_score)
 
@@ -263,8 +263,8 @@ print(f"Summary:\n{summary}\n")
 
 ### API 4-grams
 print("[*] Individual Feature Experiments - API 4-grams")
-X = utils.NPZFeature("api_4grams.csv").load().set_index(labels.index)
-slgn_stats.new_feature(utils.API_NGRAM, f"{len(api_ngrams.shape[1])} -> {len(X.columns)}")
+X = utils.NPZFeature("api_4grams.npz").load().set_index(labels.index)
+slgn_stats.new_feature(utils.API_NGRAM, f"{len(X.columns)}")
 slgn_stats.update(utils.API_NGRAM, utils.BASE, base_score)
 
 X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
@@ -298,8 +298,8 @@ print(f"Summary:\n{summary}\n")
 
 ### Opcode 4-grams
 print("[*] Individual Feature Experiments - Opcode 4-grams")
-X = utils.NPZFeature("opcode_4grams.csv").load().set_index(labels.index)
-slgn_stats.new_feature(utils.OPCODE_NGRAM, f"{len(opcode_ngrams.shape[1])} -> {len(X.columns)}")
+X = utils.NPZFeature("opcode_4grams.npz").load().set_index(labels.index)
+slgn_stats.new_feature(utils.OPCODE_NGRAM, f"{len(X.columns)}")
 slgn_stats.update(utils.OPCODE_NGRAM, utils.BASE, base_score)
 
 X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
@@ -368,8 +368,8 @@ print(f"Summary:\n{summary}\n")
 
 ### Import Libraries
 print("[*] Individual Feature Experiments - Import Libraries")
-X = utils.NPZFeature("lib_1grams.csv").load().set_index(labels.index)
-slgn_stats.new_feature(utils.IMP_LIB, f"{len(lib_ngrams.shape[1])} -> {len(X.columns)}")
+X = utils.NPZFeature("lib_1grams.npz").load().set_index(labels.index)
+slgn_stats.new_feature(utils.IMP_LIB, f"{lib_ngrams.shape[1]} -> {len(X.columns)}")
 slgn_stats.update(utils.IMP_LIB, utils.BASE, base_score)
 
 X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
@@ -407,7 +407,7 @@ intgr_stats = utils.IntegratedScoreStats("integrated_scores.csv")
 
 ### PE Section Sizes + PE Section Permissions + Content Complexity
 print("[*] Individual Feature Experiments - PE Section Sizes + PE Section Permissions + Content Complexity")
-X = utils.integrated_features((utils.SCTN_SIZE, utils.RWE_SIZE, utils.CMPLXTY))
+X = utils.integrated_features((utils.SCTN_SIZE, utils.RWE_SIZE, utils.CMPLXTY), labels)
 raw_dim = len(sctn_sizes.columns) + int(slgn_stats.df.at[utils.RWE_SIZE, "Dimension"]) + int(slgn_stats.df.at[utils.CMPLXTY, "Dimension"])
 intgr_stats.new_feature(utils.SCTN_RWE_CMPLXTY, f"{raw_dim} -> {len(X.columns)}")
 
@@ -430,7 +430,7 @@ print(auto_rf.sprint_statistics())
 
 ### PE Section Sizes + PE Section Permissions + Content Complexity + Import Libraries
 print("[*] Individual Feature Experiments - PE Section Sizes + PE Section Permissions + Content Complexity + Import Libraries")
-X = utils.integrated_features((utils.SCTN_SIZE, utils.RWE_SIZE, utils.CMPLXTY, utils.IMP_LIB))
+X = utils.integrated_features((utils.SCTN_SIZE, utils.RWE_SIZE, utils.CMPLXTY, utils.IMP_LIB), labels)
 raw_dim = len(sctn_sizes.columns) + int(slgn_stats.df.at[utils.RWE_SIZE, "Dimension"]) + int(slgn_stats.df.at[utils.CMPLXTY, "Dimension"]) + lib_ngrams.shape[1]
 intgr_stats.new_feature(utils.SCTN_RWE_CMPLXTY_LIB, f"{raw_dim} -> {len(X.columns)}")
 
@@ -452,7 +452,7 @@ print(auto_rf.sprint_statistics())
 ###
 
 ### File Sizes + API 4-grams + Opcode 4-grams
-X = utils.integrated_features((utils.FILE_SIZE, utils.API_NGRAM, utils.OPCODE_NGRAM))
+X = utils.integrated_features((utils.FILE_SIZE, utils.API_NGRAM, utils.OPCODE_NGRAM), labels)
 raw_dim = int(slgn_stats.df.at[utils.FILE_SIZE, "Dimension"]) + api_ngrams.shape[1] + opcode_ngrams.shape[1]
 intgr_stats.new_feature(utils.FILE_API_OPCODE, f"{raw_dim} → {len(X.columns)}")
 
@@ -474,7 +474,7 @@ print(auto_rf.sprint_statistics())
 ###
 
 ### All Features
-X = utils.integrated_features((utils.FILE_SIZE, utils.SCTN_SIZE, utils.RWE_SIZE, utils.CMPLXTY, utils.API_NGRAM, utils.OPCODE_NGRAM, utils.IMP_LIB))
+X = utils.integrated_features((utils.FILE_SIZE, utils.SCTN_SIZE, utils.RWE_SIZE, utils.CMPLXTY, utils.API_NGRAM, utils.OPCODE_NGRAM, utils.IMP_LIB), labels)
 raw_dim = int(slgn_stats.df.at[utils.FILE_SIZE, "Dimension"]) + len(sctn_sizes.columns) + int(slgn_stats.df.at[utils.RWE_SIZE, "Dimension"]) + int(slgn_stats.df.at[utils.CMPLXTY, "Dimension"]) + api_ngrams.shape[1] + opcode_ngrams.shape[1] + lib_ngrams.shape[1]
 intgr_stats.new_feature(utils.ALL, f"{raw_dim} → {len(X.columns)}")
 
