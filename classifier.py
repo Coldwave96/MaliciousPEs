@@ -148,7 +148,7 @@ else:
 ######
 
 ###### Individual Feature Experiments
-slgn_stats = utils.IndividualScoreStats("individual_socres.csv")
+slgn_stats = utils.IndividualScoreStats("individual_scores.csv")
 
 # Baseline
 dummy_clf = DummyClassifier(strategy="most_frequent")
@@ -369,7 +369,7 @@ print(f"Summary:\n{summary}\n")
 ### Import Libraries
 print("[*] Individual Feature Experiments - Import Libraries")
 X = utils.NPZFeature("lib_1grams.npz").load().set_index(labels.index)
-slgn_stats.new_feature(utils.IMP_LIB, f"{lib_ngrams.shape[1]} -> {len(X.columns)}")
+slgn_stats.new_feature(utils.IMP_LIB, f"{len(X.columns)}")
 slgn_stats.update(utils.IMP_LIB, utils.BASE, base_score)
 
 X_train, X_test, y_train, y_test = train_test_split(X, labels, test_size=0.2, random_state=42)
@@ -404,6 +404,8 @@ print(f"Summary:\n{summary}\n")
 
 ###### Integrated Feature Experiments
 intgr_stats = utils.IntegratedScoreStats("integrated_scores.csv")
+
+# slgn_stats = utils.IndividualScoreStats("individual_scores.csv")
 
 ### PE Section Sizes + PE Section Permissions + Content Complexity
 print("[*] Individual Feature Experiments - PE Section Sizes + PE Section Permissions + Content Complexity")

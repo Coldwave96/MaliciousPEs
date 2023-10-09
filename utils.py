@@ -336,9 +336,9 @@ class IntegratedScoreStats:
         """
         self._path: Path = stats_dir.joinpath(file)
         if self._path.exists():
-            self._df: pd.DataFrame = pd.read_csv(self._path).set_index("Features")
+            self.df: pd.DataFrame = pd.read_csv(self._path).set_index("Feature")
         else:
-            self._df: pd.DataFrame = pd.DataFrame(columns=["Feature", "Dimension", "Best Accuracy", "Best Model"])
+            self.df: pd.DataFrame = pd.DataFrame(columns=["Feature", "Dimension", "Best Accuracy", "Best Model"])
     
     def new_feature(self, name: str, dimension) -> None:
         self.df.at[name, "Dimension"] = dimension
