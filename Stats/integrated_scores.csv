@@ -1,0 +1,5 @@
+Feature,Dimension,Best Accuracy,Best Model
+Section Size + Section Permission + Content Complexity,878 -> 40,0.992984,Random Forest
+Section Size + Section Permission + Content Complexity + Import Library,1178 -> 340,0.991373,Random Forest
+File Size + API 4-gram + Opcode 4-gram,10003 → 10003,0.990223,Random Forest
+All Features,11181 → 10343,0.991948,Random Forest

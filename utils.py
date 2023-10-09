@@ -338,7 +338,7 @@ class IntegratedScoreStats:
         if self._path.exists():
             self.df: pd.DataFrame = pd.read_csv(self._path).set_index("Feature")
         else:
-            self.df: pd.DataFrame = pd.DataFrame(columns=["Feature", "Dimension", "Best Accuracy", "Best Model"])
+            self.df: pd.DataFrame = pd.DataFrame(columns=["Feature", "Dimension", "Best Accuracy", "Best Model"]).set_index("Feature")
     
     def new_feature(self, name: str, dimension) -> None:
         self.df.at[name, "Dimension"] = dimension

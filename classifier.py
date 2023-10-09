@@ -508,11 +508,11 @@ print(f"Summary:\n{summary}\n")
 stats = intgr_stats.df.copy()
 for ftr, row in slgn_stats.df.iterrows():
     stats.at[ftr, "Dimension"] = row["Dimension"]
-    stats.at[ftr, "Best Accuracy"] = row[[utils.KNN, utils.SVM, utils.RF]].max()
-    stats.at[ftr, "Best Model"] = (utils.KNN, utils.SVM, utils.RF)[row[[utils.KNN, utils.SVM, utils.RF]].values.argmax()]
+    stats.at[ftr, "Best Accuracy"] = row[[utils.KNN, utils.RF]].max()
+    stats.at[ftr, "Best Model"] = (utils.KNN, utils.RF)[row[[utils.KNN, utils.RF]].values.argmax()]
 
 stats.sort_values(by="Best Accuracy", ascending=False, inplace=True)
 stats.to_csv(utils.stats_dir.joinpath("scores.csv")) 
-summary = stats.df
+summary = stats
 print(f"Summary for all expriments:\n{summary}\n")
 ######
